@@ -7,6 +7,43 @@ import (
 	"strings"
 )
 
+type cliCommand struct {
+	name        string
+	description string
+	callback    func() error
+}
+
+var registry map[string]cliCommand
+
+func commandExit() error {
+	fmt.Println("Closing the Pokedex... Goodbye!")
+	os.Exit(0)
+	return nil
+}
+
+func commandHelp() error {
+	fmt.Print("Welcome to the Pokedex!\nUsage:\n\n\n")
+	for key, value := range registry {
+		fmt.Printf("%s: %s\n", key, value.description)
+	}
+	return nil
+}
+
+func init() {
+	registry = map[string]cliCommand{
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
+		},
+		"help": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
+		},
+	}
+}
+
 func startRepl() {
 
 	// so i need to set up a new scanner
@@ -22,7 +59,15 @@ func startRepl() {
 
 		commandName := words[0]
 
-		fmt.Printf("Your command was: %s\n", commandName)
+		command, exists := registry[commandName]
+		if exists {
+			err := command.callback()
+			if err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			fmt.Println("Unknown command")
+		}
 	}
 }
 
