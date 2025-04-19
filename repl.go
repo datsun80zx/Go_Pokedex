@@ -5,9 +5,17 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"github.com/datsun80zx/Go_Pokedex/internal/pokeapi"
 )
 
+
 func startRepl() {
+
+	config := &pokeapi.Config{
+		NextURL: nil,
+		PreviousURL: nil,
+	}
+
 	userInput := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -22,7 +30,7 @@ func startRepl() {
 
 		command, exists := getCommands()[commandName]
 		if exists {
-			err := command.callback()
+			err := command.callback(config)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -43,7 +51,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(config *pokeapi.Config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -58,11 +66,16 @@ func getCommands() map[string]cliCommand {
 			description: "Displays a help message",
 			callback:    commandHelp,
 		},
-		// "map": {
-		// 	name:        "help", 
-		// 	description: "Displays the names of 20 location areas in the Pokemon world",
-		// 	callback:	 commandMap,
-		// },
+		"map": {
+			name:        "map", 
+			description: "Displays the names of the next 20 location areas in the Pokemon world",
+			callback:	 commandMap,
+		},
+		"mapb": {
+			name:        "mapb", 
+			description: "Displays the names of the previous 20 location areas in the Pokemon world",
+			callback:	 commandMapb,
+		},
 	}
 }
 
