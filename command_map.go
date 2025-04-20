@@ -1,69 +1,39 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"github.com/datsun80zx/Go_Pokedex/internal/pokeapi"
 )
 
-func commandMap(config *pokeapi.Config) error {
-	apiURL := "https://pokeapi.co/api/v2/location-area"
-	if config.NextURL != nil && *config.NextURL != "" {
-		apiURL = *config.NextURL
-	}
-
-	locationData, err := pokeapi.GetLocationAreas(apiURL)
+func commandMapf(cfg *config) error {
+	locationsResp, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationsURL)
 	if err != nil {
-		fmt.Errorf("Error getting location data: %w", err)
-	}
-	if locationData.Next != nil {
-		config.NextURL = locationData.Next
-	} else {
-		config.NextURL = nil
+		return err
 	}
 
-	if locationData.Previous != nil {
-		config.PreviousURL = locationData.Previous
-	} else {
-		config.PreviousURL = nil
-	}
+	cfg.nextLocationsURL = locationsResp.Next
+	cfg.prevLocationsURL = locationsResp.Previous
 
-	if locationData.Results == nil {
-		return fmt.Errorf("no location data available")
-	}
-	for _, loc := range locationData.Results {
+	for _, loc := range locationsResp.Results {
 		fmt.Println(loc.Name)
 	}
 	return nil
 }
 
-func commandMapb(config *pokeapi.Config) error {
-	if config.PreviousURL == nil || *config.PreviousURL == "" {
-		fmt.Println("you're on the first page")
-		return nil
+func commandMapb(cfg *config) error {
+	if cfg.prevLocationsURL == nil {
+		return errors.New("you're on the first page")
 	}
 
-	apiURL := *config.PreviousURL
-
-	locationData, err := pokeapi.GetLocationAreas(apiURL)
+	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.prevLocationsURL)
 	if err != nil {
-		fmt.Errorf("Error getting location data: %w", err)
-	}
-	if locationData.Next != nil {
-		config.NextURL = locationData.Next
-	} else {
-		config.NextURL = nil
+		return err
 	}
 
-	if locationData.Previous != nil {
-		config.PreviousURL = locationData.Previous
-	} else {
-		config.PreviousURL = nil
-	}
+	cfg.nextLocationsURL = locationResp.Next
+	cfg.prevLocationsURL = locationResp.Previous
 
-	if locationData.Results == nil {
-		return fmt.Errorf("no location data available")
-	}
-	for _, loc := range locationData.Results {
+	for _, loc := range locationResp.Results {
 		fmt.Println(loc.Name)
 	}
 	return nil

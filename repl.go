@@ -9,19 +9,19 @@ import (
 )
 
 
-func startRepl() {
+type config struct {
+	pokeapiClient    pokeapi.Client
+	nextLocationsURL *string
+	prevLocationsURL *string
+}
 
-	config := &pokeapi.Config{
-		NextURL: nil,
-		PreviousURL: nil,
-	}
-
-	userInput := bufio.NewScanner(os.Stdin)
+func startRepl(cfg *config) {
+	reader := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
-		userInput.Scan()
+		reader.Scan()
 
-		words := cleanInput(userInput.Text())
+		words := cleanInput(reader.Text())
 		if len(words) == 0 {
 			continue
 		}
@@ -30,7 +30,7 @@ func startRepl() {
 
 		command, exists := getCommands()[commandName]
 		if exists {
-			err := command.callback(config)
+			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -43,40 +43,38 @@ func startRepl() {
 }
 
 func cleanInput(text string) []string {
-	lowered := strings.ToLower(strings.TrimSpace(text))
-	words := strings.Fields(lowered)
+	output := strings.ToLower(text)
+	words := strings.Fields(output)
 	return words
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(config *pokeapi.Config) error
+	callback    func(*config) error
 }
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
-		"exit": {
-			name:        "exit",
-			description: "Exit the Pokedex",
-			callback:    commandExit,
-		},
 		"help": {
 			name:        "help",
 			description: "Displays a help message",
 			callback:    commandHelp,
 		},
 		"map": {
-			name:        "map", 
-			description: "Displays the names of the next 20 location areas in the Pokemon world",
-			callback:	 commandMap,
+			name:        "map",
+			description: "Get the next page of locations",
+			callback:    commandMapf,
 		},
 		"mapb": {
-			name:        "mapb", 
-			description: "Displays the names of the previous 20 location areas in the Pokemon world",
-			callback:	 commandMapb,
+			name:        "mapb",
+			description: "Get the previous page of locations",
+			callback:    commandMapb,
+		},
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
 		},
 	}
 }
-
-
