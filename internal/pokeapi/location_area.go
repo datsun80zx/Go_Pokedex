@@ -13,7 +13,7 @@ func (c *Client) GetLocationArea(name string) (LocationAreaResponse, error) {
 
 	// Check cache first
 	if data, found := c.cache.Get(url); found {
-		fmt.Println("Cache hit! Using cached data for:", url)
+		// fmt.Println("Cache hit! Using cached data for:", url)
 
 		locationResp := LocationAreaResponse{}
 		err := json.Unmarshal(data, &locationResp)
@@ -23,7 +23,7 @@ func (c *Client) GetLocationArea(name string) (LocationAreaResponse, error) {
 		return locationResp, nil
 	}
 
-	fmt.Println("Cache miss! Fetching data from API:", url)
+	// fmt.Println("Cache miss! Fetching data from API:", url)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
