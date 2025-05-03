@@ -11,27 +11,27 @@ func commandPokedex(cfg *config, args []string) error {
 	}
 
 	fmt.Println("Your Pokedex:")
-	for name, pokemon := range cfg.caughtPokemon {
-		fmt.Printf(" - %s:\n", name)
-		fmt.Printf("   Base Experience: %d\n", pokemon.BaseExperience)
-		fmt.Printf("   Height: %d\n", pokemon.Height)
-		fmt.Printf("   Weight: %d\n", pokemon.Weight)
+	for _, pokemon := range cfg.caughtPokemon {
+		fmt.Printf(" - %s", pokemon.Name)
+		// fmt.Printf("   Base Experience: %d\n", pokemon.BaseExperience)
+		// fmt.Printf("   Height: %d\n", pokemon.Height)
+		// fmt.Printf("   Weight: %d\n", pokemon.Weight)
 
-		// Print types
-		fmt.Print("   Types: ")
-		for i, t := range pokemon.Types {
-			if i > 0 {
-				fmt.Print(", ")
-			}
-			fmt.Print(t.Type.Name)
-		}
-		fmt.Println()
+		// // Print types
+		// fmt.Print("   Types: ")
+		// for i, t := range pokemon.Types {
+		// 	if i > 0 {
+		// 		fmt.Print(", ")
+		// 	}
+		// 	fmt.Print(t.Type.Name)
+		// }
+		// fmt.Println()
 
-		// Print stats
-		fmt.Println("   Stats:")
-		for _, stat := range pokemon.Stats {
-			fmt.Printf("     %s: %d\n", stat.Stat.Name, stat.BaseStat)
-		}
+		// // Print stats
+		// fmt.Println("   Stats:")
+		// for _, stat := range pokemon.Stats {
+		// 	fmt.Printf("     %s: %d\n", stat.Stat.Name, stat.BaseStat)
+		// }
 		fmt.Println()
 	}
 
